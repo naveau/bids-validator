@@ -533,4 +533,9 @@ module.exports = {
     reason:
       "The column names of the electrodes file must begin with ['name', 'x', 'y', 'z']",
   },
+  97: {
+    key: 'INCONSISTENT_SESSIONS',
+    severity: 'warning',
+    reason: 'Not all subjects contains the same sessions',
+  },
 }

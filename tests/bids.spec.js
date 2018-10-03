@@ -221,4 +221,18 @@ describe('BIDS example datasets ', function() {
       isdone()
     })
   })
+
+  it('should throw a single warning per sessions if they are missing all the files', function(isdone) {
+    var options = { ignoreNiftiHeaders: true }
+    validate.BIDS('tests/data/ongoing_longitudinal_study', options, function(
+      issues,
+    ) {
+      assert(issues.warnings.length > 0)
+      expectedWarningCode = [38, 97] // Inconsistent subject and session
+      for (var w = 0; w < expectedWarningCode; w++) {
+        assert(issues.warnings.indexOf(expectedWarningCode[w]) >= 0)
+      }
+      isdone()
+    })
+  })
 })
