@@ -217,7 +217,7 @@ describe('BIDS example datasets ', function() {
     validate.BIDS('tests/data/phasediff_without_magnitude1', options, function(
       issues,
     ) {
-      assert(issues.warnings.length == 2 && issues.warnings[1].code === '92')
+      assertErrorCode(issues.warnings, '92')
       isdone()
     })
   })
@@ -227,11 +227,8 @@ describe('BIDS example datasets ', function() {
     validate.BIDS('tests/data/ongoing_longitudinal_study', options, function(
       issues,
     ) {
-      assert(issues.warnings.length > 0)
-      expectedWarningCode = [38, 97] // Inconsistent subject and session
-      for (var w = 0; w < expectedWarningCode; w++) {
-        assert(issues.warnings.indexOf(expectedWarningCode[w]) >= 0)
-      }
+      assertErrorCode(issues.warnings, '38')
+      assertErrorCode(issues.warnings, '97')
       isdone()
     })
   })
