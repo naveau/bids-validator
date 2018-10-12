@@ -25,14 +25,12 @@ const session = function missingSessionFiles(fileList) {
       if (!utils.type.isBIDS(path) || utils.type.file.isStimuliData(path)) {
         continue
       }
-      let subject
       //match the subject identifier up to the '/' in the full path to a file.
-      const match = path.match(/sub-(.*?)(?=\/)/)
+      let match = path.match(/sub-(.*?)(?=\/)/)
       if (match === null) {
         continue
-      } else {
-        subject = match[0]
       }
+      const subject = match[0]
 
       // suppress inconsistent subject warnings for sub-emptyroom scans
       // in MEG data
@@ -40,83 +38,82 @@ const session = function missingSessionFiles(fileList) {
         continue
       }
 
-    var session
-    //match the session identifier
-    match = path.match(/ses-(.*?)(?=\/)/)
-    if (match === null) {
-      // global file of the subject or single session dataset
-      // initialize an empty array if we haven't seen this subject before
-      if (typeof subjects[subject] === 'undefined') {
-        subjects[subject] = []
+      //match the session identifier
+      match = path.match(/ses-(.*?)(?=\/)/)
+      if (match === null) {
+        // global file of the subject or single session dataset
+        // initialize an empty array if we haven't seen this subject before
+        if (typeof subjects[subject] === 'undefined') {
+          subjects[subject] = []
+        }
+        // files are prepended with subject name, the following two commands
+        // remove the subject from the file name to allow filenames to be more
+        // easily compared
+        filename = path.substring(path.match(subject).index + subject.length)
+        filename = filename.replace(subject, '<sub>')
+        subjects[subject].push(filename)
+      } else {
+        const session = match[0]
+        // initialize an empty array if we haven't seen this subject and session before
+        if (typeof sessions[subject] === 'undefined') {
+          sessions[subject] = {}
+        }
+        if (typeof sessions[subject][session] === 'undefined') {
+          sessions[subject][session] = []
+        }
+        // files are prepended with subject name and session,
+        // the following commands remove the subject/session
+        // from the file name to allow filenames to be more
+        // easily compared
+        filename = path.substring(path.match(session).index + session.length)
+        filename = filename.replace(subject, '<sub>')
+        filename = filename.replace(session, '<ses>')
+        sessions[subject][session].push(filename)
       }
-      // files are prepended with subject name, the following two commands
-      // remove the subject from the file name to allow filenames to be more
-      // easily compared
-      filename = path.substring(path.match(subject).index + subject.length)
-      filename = filename.replace(subject, '<sub>')
-      subjects[subject].push(filename)
-    } else {
-      session = match[0]
-      // initialize an empty array if we haven't seen this subject and session before
-      if (typeof sessions[subject] === 'undefined') {
-        sessions[subject] = {}
-      }
-      if (typeof sessions[subject][session] === 'undefined') {
-        sessions[subject][session] = []
-      }
-      // files are prepended with subject name and session,
-      // the following commands remove the subject/session
-      // from the file name to allow filenames to be more
-      // easily compared
-      filename = path.substring(path.match(session).index + session.length)
-      filename = filename.replace(subject, '<sub>')
-      filename = filename.replace(session, '<ses>')
-      sessions[subject][session].push(filename)
-    }
     }
   }
 
-  var expected_subject_files = []
-  var expected_subjects = []
+  const expected_subject_files = []
+  const expected_subjects = []
+  for (let subjKey in subjects) {
     if (expected_subjects.indexOf(subjKey) < 0) {
       expected_subjects.push(subjKey)
     }
-    for (var i = 0; i < subject.length; i++) {
-      file = subject[i]
+    const subject = subjects[subjKey]
+    for (let i = 0; i < subject.length; i++) {
+      const file = subject[i]
       if (expected_subject_files.indexOf(file) < 0) {
         expected_subject_files.push(file)
       }
     }
   }
 
-  var expected_session_files = []
-  var expected_sessions = []
-  for (var subjKey in sessions) {
-    subject = sessions[subjKey]
+  const expected_session_files = []
+  const expected_sessions = []
+  for (let subjKey in sessions) {
+    const subject = sessions[subjKey]
     if (expected_subjects.indexOf(subjKey) < 0) {
       expected_subjects.push(subjKey)
     }
+    for (let sesKey in subject) {
+      const session = subject[sesKey]
       if (expected_sessions.indexOf(sesKey) < 0) {
         expected_sessions.push(sesKey)
       }
-      session = subject[sesKey]
-      for (var i = 0; i < session.length; i++) {
-        file = session[i]
+      for (let i = 0; i < session.length; i++) {
+        const file = session[i]
         if (expected_session_files.indexOf(file) < 0) {
           expected_session_files.push(file)
-        }
         }
       }
     }
   }
 
-  var fileThatsMissing
-
   // Missing subject files
-  for (var j = 0; j < expected_subjects.length; j++) {
-    subject = expected_subjects[j]
+  for (let j = 0; j < expected_subjects.length; j++) {
+    const subject = expected_subjects[j]
     for (
-      var set_file = 0;
+      let set_file = 0;
       set_file < expected_subject_files.length;
       set_file++
     ) {
@@ -125,7 +122,7 @@ const session = function missingSessionFiles(fileList) {
           continue
         }
       }
-      fileThatsMissing =
+      const fileThatsMissing =
         '/' +
         subject +
         expected_subject_files[set_file].replace('<sub>', subject)
@@ -150,10 +147,10 @@ const session = function missingSessionFiles(fileList) {
   }
 
   // Missing session files
-  for (var j = 0; j < expected_subjects.length; j++) {
-    subject = expected_subjects[j]
-    for (var k = 0; k < expected_sessions.length; k++) {
-      session = expected_sessions[k]
+  for (let j = 0; j < expected_subjects.length; j++) {
+    const subject = expected_subjects[j]
+    for (let k = 0; k < expected_sessions.length; k++) {
+      const session = expected_sessions[k]
       // missing full session directory
       if (typeof sessions[subject][session] === 'undefined') {
         issues.push(
@@ -168,7 +165,7 @@ const session = function missingSessionFiles(fileList) {
         continue
       }
       for (
-        var set_file = 0;
+        let set_file = 0;
         set_file < expected_session_files.length;
         set_file++
       ) {
@@ -177,7 +174,7 @@ const session = function missingSessionFiles(fileList) {
             expected_session_files[set_file],
           ) === -1
         ) {
-          fileThatsMissing =
+          const fileThatsMissing =
             '/' +
             subject +
             '/' +
