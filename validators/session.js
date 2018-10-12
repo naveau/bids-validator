@@ -76,14 +76,16 @@ const session = function missingSessionFiles(fileList) {
   const expected_subject_files = []
   const expected_subjects = []
   for (let subjKey in subjects) {
-    if (expected_subjects.indexOf(subjKey) < 0) {
-      expected_subjects.push(subjKey)
-    }
-    const subject = subjects[subjKey]
-    for (let i = 0; i < subject.length; i++) {
-      const file = subject[i]
-      if (expected_subject_files.indexOf(file) < 0) {
-        expected_subject_files.push(file)
+    if (subjects.hasOwnProperty(subjKey)) {
+      if (expected_subjects.indexOf(subjKey) < 0) {
+        expected_subjects.push(subjKey)
+      }
+      const subject = subjects[subjKey]
+      for (let i = 0; i < subject.length; i++) {
+        const file = subject[i]
+        if (expected_subject_files.indexOf(file) < 0) {
+          expected_subject_files.push(file)
+        }
       }
     }
   }
@@ -91,19 +93,23 @@ const session = function missingSessionFiles(fileList) {
   const expected_session_files = []
   const expected_sessions = []
   for (let subjKey in sessions) {
-    const subject = sessions[subjKey]
-    if (expected_subjects.indexOf(subjKey) < 0) {
-      expected_subjects.push(subjKey)
-    }
-    for (let sesKey in subject) {
-      const session = subject[sesKey]
-      if (expected_sessions.indexOf(sesKey) < 0) {
-        expected_sessions.push(sesKey)
+    if (sessions.hasOwnProperty(subjKey)) {
+      const subject = sessions[subjKey]
+      if (expected_subjects.indexOf(subjKey) < 0) {
+        expected_subjects.push(subjKey)
       }
-      for (let i = 0; i < session.length; i++) {
-        const file = session[i]
-        if (expected_session_files.indexOf(file) < 0) {
-          expected_session_files.push(file)
+      for (let sesKey in subject) {
+        if (subject.hasOwnProperty(sesKey)) {
+          const session = subject[sesKey]
+          if (expected_sessions.indexOf(sesKey) < 0) {
+            expected_sessions.push(sesKey)
+          }
+          for (let i = 0; i < session.length; i++) {
+            const file = session[i]
+            if (expected_session_files.indexOf(file) < 0) {
+              expected_session_files.push(file)
+            }
+          }
         }
       }
     }
